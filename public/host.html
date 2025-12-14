@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Host Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <h1>Meeting Mood Dashboard</h1>
+
+  <h2 id="overallMood">Overall Mood: Waiting...</h2>
+
+  <h3>Emotion Counts (Bar Chart)</h3>
+  <canvas id="barChart" width="300" height="150"></canvas>
+
+  <h3>Emotion Distribution (Pie Chart)</h3>
+  <canvas id="pieChart" width="350" height="350"></canvas>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="host.js"></script>
+
+</body>
+</html>
+
+
+
+

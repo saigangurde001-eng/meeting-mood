@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Participant</title>
+</head>
+<body>
+
+  <h2>Meeting in Progress</h2>
+  <p>Camera is used only for emotion detection.</p>
+
+  <button id="startBtn">Start Camera</button>
+  <br><br>
+
+  <video id="video" width="400" height="300" autoplay muted playsinline></video>
+
+  <!-- IMPORTANT: script order -->
+  <script src="/socket.io/socket.io.js"></script>
+<script src="face-api.min.js"></script>
+<script src="participant.js"></script>
+
+
+</body>
+</html>
+
+
+
