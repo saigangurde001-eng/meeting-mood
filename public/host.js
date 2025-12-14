@@ -1,71 +1,75 @@
 const socket = io();
 
-const overallMoodText = document.getElementById("overallMood");
+const emotionCounts = {
+  happy: 0,
+  sad: 0,
+  angry: 0,
+  neutral: 0,
+  surprised: 0,
+  fearful: 0,
+  disgusted: 0
+};
 
-const emotions = ["happy", "sad", "angry", "neutral", "surprise", "fear", "disgust"];
-const emotionCounts = {};
-
-emotions.forEach((e) => (emotionCounts[e] = 0));
-
-/* ---------------- BAR CHART ---------------- */
-const barCtx = document.getElementById("barChart").getContext("2d");
-
-const barChart = new Chart(barCtx, {
-  type: "bar",
-  data: {
-    labels: emotions,
-    datasets: [
-      {
+// BAR CHART
+const barChart = new Chart(
+  document.getElementById("barChart"),
+  {
+    type: "bar",
+    data: {
+      labels: Object.keys(emotionCounts),
+      datasets: [{
         label: "Emotion Count",
-        data: emotions.map((e) => emotionCounts[e]),
-      },
-    ],
-  },
-  options: {
-    responsive: true,
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
+        data: Object.values(emotionCounts),
+        backgroundColor: "rgba(54, 162, 235, 0.7)"
+      }]
     },
-  },
-});
+    options: { responsive: true }
+  }
+);
 
-/* ---------------- PIE CHART ---------------- */
-const pieCtx = document.getElementById("pieChart").getContext("2d");
+// PIE CHART
+const pieChart = new Chart(
+  document.getElementById("pieChart"),
+  {
+    type: "pie",
+    data: {
+      labels: Object.keys(emotionCounts),
+      datasets: [{
+        data: Object.values(emotionCounts),
+        backgroundColor: [
+          "#4CAF50", "#2196F3", "#F44336",
+          "#9E9E9E", "#FFC107", "#673AB7", "#FF5722"
+        ]
+      }]
+    }
+  }
+);
 
-const pieChart = new Chart(pieCtx, {
-  type: "pie",
-  data: {
-    labels: emotions,
-    datasets: [
-      {
-        data: emotions.map((e) => emotionCounts[e]),
-      },
-    ],
-  },
-});
-
-/* ---------------- SOCKET ---------------- */
-socket.on("emotion", (emotion) => {
-  if (!emotionCounts[emotion]) return;
-
+// SOCKET
+socket.on("emotionUpdate", (emotion) => {
+  console.log("Host received:", emotion);
   emotionCounts[emotion]++;
+  updateCharts();
+  updateOverallMood();
+});
 
-  // Update charts
-  barChart.data.datasets[0].data = emotions.map((e) => emotionCounts[e]);
+function updateCharts() {
+  barChart.data.datasets[0].data = Object.values(emotionCounts);
   barChart.update();
 
-  pieChart.data.datasets[0].data = emotions.map((e) => emotionCounts[e]);
+  pieChart.data.datasets[0].data = Object.values(emotionCounts);
   pieChart.update();
+}
 
-  // Overall mood logic
-  const dominantEmotion = Object.keys(emotionCounts).reduce((a, b) =>
+function updateOverallMood() {
+  const overall = Object.keys(emotionCounts).reduce((a, b) =>
     emotionCounts[a] > emotionCounts[b] ? a : b
   );
+  document.getElementById("overallMood").innerText = overall;
+}
 
-  overallMoodText.innerText = dominantEmotion.toUpperCase();
-});
+
+
 
 
 
