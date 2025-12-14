@@ -1,41 +1,48 @@
-console.log("participant.js loaded");
-
 const video = document.getElementById("video");
 const startBtn = document.getElementById("startBtn");
-const socket = io();
 
-Promise.all([
-  faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-  faceapi.nets.faceExpressionNet.loadFromUri('/models')
-]).then(() => {
-  console.log("Models loaded");
-});
+const socket = io(); // auto-connects to same domain
 
-startBtn.onclick = async () => {
-  console.log("Start button clicked");
+// Load face-api models
+async function loadModels() {
+  const MODEL_URL = "/models";
+  await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+  await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
+}
 
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    video.srcObject = stream;
-    console.log("Camera started");
+// Start webcam
+async function startCamera() {
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  video.srcObject = stream;
+}
 
-    setInterval(detectEmotion, 4000);
-  } catch (err) {
-    console.error("Camera error:", err);
-  }
-};
-
+// Detect emotions and send to server
 async function detectEmotion() {
   const detection = await faceapi
     .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
     .withFaceExpressions();
 
-  if (detection) {
-    const expr = detection.expressions;
-    const emotion = Object.keys(expr)
-      .reduce((a, b) => expr[a] > expr[b] ? a : b);
+  if (detection && detection.expressions) {
+    const expressions = detection.expressions;
+
+    // Get highest emotion
+    const emotion = Object.keys(expressions).reduce((a, b) =>
+      expressions[a] > expressions[b] ? a : b
+    );
 
     socket.emit("emotion", emotion);
   }
 }
+
+// Button click
+startBtn.addEventListener("click", async () => {
+  await loadModels();
+  await startCamera();
+
+  video.addEventListener("play", () => {
+    setInterval(detectEmotion, 1500);
+  });
+});
+
+
 
