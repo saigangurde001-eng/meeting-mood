@@ -100,7 +100,6 @@ function updateEmotionStats() {
   pieChart.update();
 
   updateOverallMood();
-  updateEngagementScore(percentages);
 }
 
 function updateOverallMood() {
@@ -124,36 +123,6 @@ function updateOverallMood() {
   moodEl.style.color = colors[dominant] || "#333";
 }
 
-// ------------------ ENGAGEMENT SCORE ------------------
-function updateEngagementScore(percentages) {
-  const labels = Object.keys(emotionCounts);
-
-  const weights = {
-    happy: 1.0,
-    surprised: 0.9,
-    neutral: 0.6,
-    sad: 0.3,
-    angry: 0.2,
-    fearful: 0.2,
-    disgusted: 0.2
-  };
-
-  let score = 0;
-  labels.forEach((emotion, index) => {
-    score += percentages[index] * weights[emotion];
-  });
-
-  score = Math.round(score);
-
-  const scoreEl = document.getElementById("engagementScore");
-  scoreEl.innerText = score + "%";
-
-  if (score >= 70) scoreEl.style.color = "#4CAF50";
-  else if (score >= 40) scoreEl.style.color = "#FFC107";
-  else scoreEl.style.color = "#F44336";
-}
-
-}
 
 
 
