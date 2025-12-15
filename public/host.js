@@ -1,5 +1,6 @@
 const socket = io();
 
+// ------------------ DATA ------------------
 const emotionCounts = {
   happy: 0,
   sad: 0,
@@ -10,7 +11,11 @@ const emotionCounts = {
   disgusted: 0
 };
 
-// BAR CHART
+// Store last N emotions for smoothing
+const emotionHistory = [];
+const HISTORY_LIMIT = 20;
+
+// ------------------ BAR CHART ------------------
 const barChart = new Chart(
   document.getElementById("barChart"),
   {
@@ -18,16 +23,27 @@ const barChart = new Chart(
     data: {
       labels: Object.keys(emotionCounts),
       datasets: [{
-        label: "Emotion Count",
-        data: Object.values(emotionCounts),
-        backgroundColor: "rgba(54, 162, 235, 0.7)"
+        label: "Emotion %",
+        data: [],
+        backgroundColor: "rgba(79, 172, 254, 0.7)"
       }]
     },
-    options: { responsive: true }
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            callback: value => value + "%"
+          }
+        }
+      }
+    }
   }
 );
 
-// PIE CHART
+// ------------------ PIE CHART ------------------
 const pieChart = new Chart(
   document.getElementById("pieChart"),
   {
@@ -35,7 +51,7 @@ const pieChart = new Chart(
     data: {
       labels: Object.keys(emotionCounts),
       datasets: [{
-        data: Object.values(emotionCounts),
+        data: [],
         backgroundColor: [
           "#4CAF50", "#2196F3", "#F44336",
           "#9E9E9E", "#FFC107", "#673AB7", "#FF5722"
@@ -45,28 +61,64 @@ const pieChart = new Chart(
   }
 );
 
-// SOCKET
+// ------------------ SOCKET ------------------
 socket.on("emotionUpdate", (emotion) => {
-  console.log("Host received:", emotion);
-  emotionCounts[emotion]++;
-  updateCharts();
-  updateOverallMood();
+  if (!emotionCounts.hasOwnProperty(emotion)) return;
+
+  emotionHistory.push(emotion);
+  if (emotionHistory.length > HISTORY_LIMIT) {
+    emotionHistory.shift();
+  }
+
+  updateEmotionStats();
 });
 
-function updateCharts() {
-  barChart.data.datasets[0].data = Object.values(emotionCounts);
+// ------------------ FUNCTIONS ------------------
+function updateEmotionStats() {
+  // Reset counts
+  Object.keys(emotionCounts).forEach(e => emotionCounts[e] = 0);
+
+  // Count emotions from history
+  emotionHistory.forEach(e => emotionCounts[e]++);
+
+  const total = emotionHistory.length || 1;
+
+  const percentages = Object.values(emotionCounts).map(
+    count => Math.round((count / total) * 100)
+  );
+
+  // Update charts
+  barChart.data.datasets[0].data = percentages;
   barChart.update();
 
-  pieChart.data.datasets[0].data = Object.values(emotionCounts);
+  pieChart.data.datasets[0].data = percentages;
   pieChart.update();
+
+  updateOverallMood();
 }
 
 function updateOverallMood() {
-  const overall = Object.keys(emotionCounts).reduce((a, b) =>
+  const dominant = Object.keys(emotionCounts).reduce((a, b) =>
     emotionCounts[a] > emotionCounts[b] ? a : b
   );
-  document.getElementById("overallMood").innerText = overall;
+
+  const moodElement = document.getElementById("overallMood");
+  moodElement.innerText = dominant.toUpperCase();
+
+  // Color coding
+  const moodColors = {
+    happy: "#4CAF50",
+    surprised: "#FFC107",
+    neutral: "#9E9E9E",
+    sad: "#2196F3",
+    angry: "#F44336",
+    fearful: "#673AB7",
+    disgusted: "#FF5722"
+  };
+
+  moodElement.style.color = moodColors[dominant] || "#333";
 }
+
 
 
 
