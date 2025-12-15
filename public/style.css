@@ -1,3 +1,4 @@
+/* -------- Base -------- */
 body {
   margin: 0;
   font-family: "Segoe UI", sans-serif;
@@ -5,55 +6,90 @@ body {
   color: #333;
 }
 
-/* Header */
+/* -------- Header -------- */
 .header {
   background: linear-gradient(135deg, #4facfe, #00f2fe);
   color: white;
-  padding: 25px;
-  text-align: center;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .header h1 {
   margin: 0;
-  font-size: 2.5rem;
+  font-size: 2.4rem;
 }
 
 .header p {
-  margin-top: 6px;
-  font-size: 1rem;
+  margin: 4px 0 0;
+  font-size: 0.95rem;
   opacity: 0.9;
 }
 
-/* Overall mood */
-.overall {
-  text-align: center;
-  margin: 25px 0 10px;
-  font-size: 1.6rem;
-}
-
-#overallMood {
+/* -------- Toggle Button -------- */
+.toggle-btn {
+  background: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 20px;
+  cursor: pointer;
   font-weight: bold;
+  font-size: 0.9rem;
 }
 
-/* Dashboard layout */
+/* -------- Stats -------- */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 20px 0;
+}
+
+.overall,
+.participants {
+  font-size: 1.4rem;
+}
+
+/* -------- Dashboard -------- */
 .dashboard {
   display: flex;
+  justify-content: center;
   gap: 25px;
   padding: 20px;
-  justify-content: center;
   flex-wrap: wrap;
 }
 
-/* Cards */
+/* -------- Cards -------- */
 .card {
   background: white;
   border-radius: 14px;
   padding: 15px;
   width: 420px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .card h3 {
   text-align: center;
   margin-bottom: 10px;
 }
+
+/* -------- Dark Mode -------- */
+body.dark {
+  background: #121212;
+  color: #f4f4f4;
+}
+
+body.dark .card {
+  background: #1e1e1e;
+}
+
+body.dark .toggle-btn {
+  background: #333;
+  color: white;
+}
+
+body.dark .header {
+  background: linear-gradient(135deg, #232526, #414345);
+}
+

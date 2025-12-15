@@ -11,24 +11,33 @@ const io = new Server(server);
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/models", express.static(path.join(__dirname, "models")));
 
-// Socket logic
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+// ------------------ PARTICIPANT COUNT ------------------
+let activeUsers = 0;
 
+io.on("connection", (socket) => {
+  activeUsers++;
+  io.emit("participantCount", activeUsers);
+
+  console.log("User connected:", socket.id, "Active:", activeUsers);
+
+  // Emotion data from participant
   socket.on("emotion", (emotion) => {
-    console.log("Emotion received:", emotion);
-    io.emit("emotionUpdate", emotion); // send to host
+    io.emit("emotionUpdate", emotion);
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
+    activeUsers--;
+    io.emit("participantCount", activeUsers);
+    console.log("User disconnected:", socket.id, "Active:", activeUsers);
   });
 });
 
+// Render-compatible port
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

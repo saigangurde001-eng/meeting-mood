@@ -4,35 +4,40 @@
   <meta charset="UTF-8" />
   <title>MoodSync – Host Dashboard</title>
 
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
   <!-- Header -->
   <header class="header">
-    <h1>MoodSync</h1>
-    <p>Real-time Emotion Analytics for Online Meetings</p>
+    <div>
+      <h1>MoodSync</h1>
+      <p>Real-time Emotion Analytics for Online Meetings</p>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <button id="darkToggle" class="toggle-btn">🌙 Dark Mode</button>
   </header>
 
-  <!-- Overall Mood -->
-  <h2 class="overall">
-    Overall Mood: <span id="overallMood">Waiting...</span>
-  </h2>
+  <!-- Stats -->
+  <div class="stats">
+    <h2 class="overall">
+      Overall Mood: <span id="overallMood">Waiting...</span>
+    </h2>
+    <h2 class="participants">
+      Participants: <span id="participantCount">0</span>
+    </h2>
+  </div>
 
   <!-- Dashboard -->
   <div class="dashboard">
 
-    <!-- Bar Chart -->
     <div class="card">
       <h3>Emotion Distribution (%)</h3>
       <canvas id="barChart"></canvas>
     </div>
 
-    <!-- Pie Chart -->
     <div class="card">
       <h3>Overall Mood Share</h3>
       <canvas id="pieChart"></canvas>
@@ -40,12 +45,12 @@
 
   </div>
 
-  <!-- Scripts -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="host.js"></script>
 
 </body>
 </html>
+
 
 
 
