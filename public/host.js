@@ -11,7 +11,7 @@ const emotionCounts = {
   disgusted: 0
 };
 
-// Store last N emotions for smoothing
+// Smooth data using recent history
 const emotionHistory = [];
 const HISTORY_LIMIT = 20;
 
@@ -53,8 +53,13 @@ const pieChart = new Chart(
       datasets: [{
         data: [],
         backgroundColor: [
-          "#4CAF50", "#2196F3", "#F44336",
-          "#9E9E9E", "#FFC107", "#673AB7", "#FF5722"
+          "#4CAF50", // happy
+          "#2196F3", // sad
+          "#F44336", // angry
+          "#9E9E9E", // neutral
+          "#FFC107", // surprised
+          "#673AB7", // fearful
+          "#FF5722"  // disgusted
         ]
       }]
     }
@@ -78,7 +83,7 @@ function updateEmotionStats() {
   // Reset counts
   Object.keys(emotionCounts).forEach(e => emotionCounts[e] = 0);
 
-  // Count emotions from history
+  // Count recent emotions
   emotionHistory.forEach(e => emotionCounts[e]++);
 
   const total = emotionHistory.length || 1;
@@ -95,6 +100,7 @@ function updateEmotionStats() {
   pieChart.update();
 
   updateOverallMood();
+  updateEngagementScore(percentages);
 }
 
 function updateOverallMood() {
@@ -102,11 +108,10 @@ function updateOverallMood() {
     emotionCounts[a] > emotionCounts[b] ? a : b
   );
 
-  const moodElement = document.getElementById("overallMood");
-  moodElement.innerText = dominant.toUpperCase();
+  const moodEl = document.getElementById("overallMood");
+  moodEl.innerText = dominant.toUpperCase();
 
-  // Color coding
-  const moodColors = {
+  const colors = {
     happy: "#4CAF50",
     surprised: "#FFC107",
     neutral: "#9E9E9E",
@@ -116,7 +121,38 @@ function updateOverallMood() {
     disgusted: "#FF5722"
   };
 
-  moodElement.style.color = moodColors[dominant] || "#333";
+  moodEl.style.color = colors[dominant] || "#333";
+}
+
+// ------------------ ENGAGEMENT SCORE ------------------
+function updateEngagementScore(percentages) {
+  const labels = Object.keys(emotionCounts);
+
+  const weights = {
+    happy: 1.0,
+    surprised: 0.9,
+    neutral: 0.6,
+    sad: 0.3,
+    angry: 0.2,
+    fearful: 0.2,
+    disgusted: 0.2
+  };
+
+  let score = 0;
+  labels.forEach((emotion, index) => {
+    score += percentages[index] * weights[emotion];
+  });
+
+  score = Math.round(score);
+
+  const scoreEl = document.getElementById("engagementScore");
+  scoreEl.innerText = score + "%";
+
+  if (score >= 70) scoreEl.style.color = "#4CAF50";
+  else if (score >= 40) scoreEl.style.color = "#FFC107";
+  else scoreEl.style.color = "#F44336";
+}
+
 }
 
 
